@@ -7,6 +7,7 @@ Riferimento: Sezione 4.1, Algorithm 1 del paper.
 """
 
 import numpy as np
+from tqdm import tqdm
 
 from src.models.cnn import create_model
 from src.federation.client import FLClient
@@ -86,7 +87,15 @@ class FLServer:
         """
         x_test, y_test = test_data
 
-        for round_num in range(1, num_rounds + 1):
+        pbar = tqdm(
+            range(1, num_rounds + 1),
+            desc="FedAvg",
+            unit="round",
+            disable=(verbose == 0),
+            bar_format="{l_bar}{bar:30}{r_bar}",
+        )
+
+        for round_num in pbar:
             global_weights = self.global_model.get_weights()
 
             client_weights = []
@@ -119,14 +128,11 @@ class FLServer:
             self.history["recall"].append(metrics["recall"])
             self.history["f1"].append(metrics["f1"])
 
-            if verbose >= 1:
-                print(
-                    f"Round {round_num}/{num_rounds} - "
-                    f"loss: {loss:.4f} - acc: {acc:.4f} - "
-                    f"precision: {metrics['precision']:.4f} - "
-                    f"recall: {metrics['recall']:.4f} - "
-                    f"f1: {metrics['f1']:.4f}"
-                )
+            pbar.set_postfix(
+                loss=f"{loss:.4f}",
+                acc=f"{acc:.4f}",
+                f1=f"{metrics['f1']:.4f}",
+            )
 
         return self.history
 

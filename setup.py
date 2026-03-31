@@ -19,5 +19,6 @@ setup(
         "matplotlib>=3.8.0",
         "pyyaml>=6.0",
         "scikit-learn>=1.3.0",
+        "tqdm>=4.66.0",
     ],
 )

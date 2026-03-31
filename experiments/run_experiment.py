@@ -125,10 +125,19 @@ def _run_with_dp(server, test_data, fl_config, dp_config):
     delta = dp_config["delta"]
     clip_norm = dp_config.get("clip_norm", 1.0)
 
+    from tqdm import tqdm
     from src.federation.strategy import federated_averaging
     from src.metrics.evaluation import evaluate_with_metrics
 
-    for round_num in range(1, fl_config["num_rounds"] + 1):
+    num_rounds = fl_config["num_rounds"]
+    pbar = tqdm(
+        range(1, num_rounds + 1),
+        desc="FedAvg+DP",
+        unit="round",
+        bar_format="{l_bar}{bar:30}{r_bar}",
+    )
+
+    for round_num in pbar:
         global_weights = server.global_model.get_weights()
 
         client_weights = []
@@ -161,10 +170,10 @@ def _run_with_dp(server, test_data, fl_config, dp_config):
         server.history["recall"].append(metrics["recall"])
         server.history["f1"].append(metrics["f1"])
 
-        print(
-            f"Round {round_num}/{fl_config['num_rounds']} [DP] - "
-            f"loss: {loss:.4f} - acc: {acc:.4f} - "
-            f"f1: {metrics['f1']:.4f}"
+        pbar.set_postfix(
+            loss=f"{loss:.4f}",
+            acc=f"{acc:.4f}",
+            f1=f"{metrics['f1']:.4f}",
         )
 
     return server.history
