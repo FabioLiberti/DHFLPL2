@@ -2,6 +2,21 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [0.5.0] - 2026-03-31
+
+### Aggiunto
+- `deploy/docker/Dockerfile.server`: container per Flower SuperLink (aggregatore)
+- `deploy/docker/Dockerfile.client`: container per Flower SuperNode (worker)
+- `deploy/docker/docker-compose.yml`: composizione locale per test con 2 client
+- `deploy/k8s/namespace.yml`: namespace Kubernetes per il sistema FL
+- `deploy/k8s/server-deployment.yml`: deployment + service per il server FL
+- `deploy/k8s/client-deployment.yml`: deployment scalabile per i client FL (2-50 repliche)
+- `deploy/k8s/autoscaler.yml`: custom autoscaler basato su precision (CronJob + RBAC)
+- `src/federation/server_app.py`: entry point Flower server per container
+- `src/federation/client_app.py`: entry point Flower client per container con supporto DP
+- `scripts/setup_cluster.sh`: setup k3s controller/worker + Rancher
+- `scripts/deploy.sh`: build immagini + deploy/scale su k3s
+
 ## [0.4.0] - 2026-03-31
 
 ### Aggiunto

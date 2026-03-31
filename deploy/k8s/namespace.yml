@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: federated-learning
+  labels:
+    app: dhflpl2
+    project: federated-learning

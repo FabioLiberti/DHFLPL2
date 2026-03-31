@@ -1,0 +1,27 @@
+FROM python:3.11-slim
+
+LABEL maintainer="Fabio Liberti <fabio.liberti@studenti.unimercatorum.it>"
+LABEL description="DHFLPL2 - Flower SuperLink (FL aggregator server)"
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ src/
+COPY setup.py .
+
+RUN pip install --no-cache-dir -e .
+
+EXPOSE 8080
+
+ENV FL_SERVER_ADDRESS=0.0.0.0:8080
+ENV FL_NUM_ROUNDS=150
+ENV FL_MIN_CLIENTS=2
+ENV FL_DATASET=cifar10
+
+CMD ["python", "-m", "src.federation.server_app"]

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fl-client
+  namespace: federated-learning
+  labels:
+    app: fl-client
+    component: supernode
+spec:
+  # Scalabile da 2 a 50 client:
+  # kubectl scale deployment fl-client --replicas=50 -n federated-learning
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fl-client
+  template:
+    metadata:
+      labels:
+        app: fl-client
+        component: supernode
+    spec:
+      # Supporto architetture eterogenee ARM64 + x86_64
+      # I nodi k3s possono essere mix di ARM e Intel
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - fl-client
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: fl-client
+          image: dhflpl2/client:latest
+          env:
+            - name: FL_SERVER_ADDRESS
+              value: "fl-server:8080"
+            - name: FL_DATASET
+              value: "cifar10"
+            - name: FL_LOCAL_EPOCHS
+              value: "1"
+            - name: FL_BATCH_SIZE
+              value: "32"
+            - name: FL_DP_ENABLED
+              value: "false"
+            - name: FL_DP_EPSILON
+              value: "1.0"
+            - name: FL_DP_DELTA
+              value: "1e-5"
+            - name: FL_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"

@@ -1,0 +1,29 @@
+FROM python:3.11-slim
+
+LABEL maintainer="Fabio Liberti <fabio.liberti@studenti.unimercatorum.it>"
+LABEL description="DHFLPL2 - Flower SuperNode (FL worker client)"
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ src/
+COPY setup.py .
+
+RUN pip install --no-cache-dir -e .
+
+ENV FL_SERVER_ADDRESS=server:8080
+ENV FL_CLIENT_ID=0
+ENV FL_DATASET=cifar10
+ENV FL_LOCAL_EPOCHS=1
+ENV FL_BATCH_SIZE=32
+ENV FL_DP_ENABLED=false
+ENV FL_DP_EPSILON=1.0
+ENV FL_DP_DELTA=1e-5
+
+CMD ["python", "-m", "src.federation.client_app"]

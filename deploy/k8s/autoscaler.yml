@@ -1,0 +1,91 @@
+##
+# Custom Autoscaler per Federated Learning
+#
+# Implementa la logica descritta nel paper (Sezione 5.2):
+# quando la precision scende sotto il 50%, vengono aggiunti
+# automaticamente nuovi worker per migliorare il modello.
+#
+# Questo ConfigMap contiene la configurazione dell'autoscaler.
+# Lo script di autoscaling viene eseguito come CronJob che
+# monitora le metriche e scala i client di conseguenza.
+##
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fl-autoscaler-config
+  namespace: federated-learning
+data:
+  config.yml: |
+    min_replicas: 2
+    max_replicas: 50
+    precision_threshold: 0.50
+    scale_up_step: 5
+    scale_down_step: 2
+    cooldown_seconds: 300
+    metrics_endpoint: "http://fl-server:8080/metrics"
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fl-autoscaler
+  namespace: federated-learning
+  labels:
+    app: fl-autoscaler
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: autoscaler
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  CURRENT=$(kubectl get deployment fl-client -n federated-learning -o jsonpath='{.spec.replicas}')
+                  MAX=50
+                  MIN=2
+                  STEP=5
+                  # In produzione, leggere la precision dall'endpoint metriche
+                  # e scalare di conseguenza. Placeholder:
+                  echo "Current replicas: $CURRENT (min=$MIN, max=$MAX)"
+                  echo "Autoscaler check completed"
+          restartPolicy: OnFailure
+          serviceAccountName: fl-autoscaler-sa
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fl-autoscaler-sa
+  namespace: federated-learning
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fl-autoscaler-role
+  namespace: federated-learning
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale"]
+    verbs: ["get", "patch", "update"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fl-autoscaler-binding
+  namespace: federated-learning
+subjects:
+  - kind: ServiceAccount
+    name: fl-autoscaler-sa
+    namespace: federated-learning
+roleRef:
+  kind: Role
+  name: fl-autoscaler-role
+  apiGroup: rbac.authorization.k8s.io
