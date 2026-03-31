@@ -30,8 +30,16 @@ echo "============================================================"
 echo "FASE 1: Esperimenti standard (senza DP)"
 echo "============================================================"
 
+RESULTS_DIR="$PROJECT_DIR/experiments/results"
+
 for config in cifar10 cifar100 mnist fashion_mnist svhn; do
     for clients in 2 5 10 20 50; do
+        RESULT_FILE="$RESULTS_DIR/${config}_${clients}clients.json"
+        if [ -f "$RESULT_FILE" ]; then
+            echo ""
+            echo ">>> SKIP $config - $clients client (gia' eseguito: $RESULT_FILE)"
+            continue
+        fi
         echo ""
         echo ">>> $config - $clients client"
         python -m experiments.run_experiment \
@@ -50,6 +58,12 @@ echo "============================================================"
 
 for config in cifar10_dp cifar100_dp mnist_dp fashion_mnist_dp svhn_dp; do
     for clients in 2 5 10 20 50; do
+        RESULT_FILE="$RESULTS_DIR/${config}_${clients}clients.json"
+        if [ -f "$RESULT_FILE" ]; then
+            echo ""
+            echo ">>> SKIP $config - $clients client (gia' eseguito: $RESULT_FILE)"
+            continue
+        fi
         echo ""
         echo ">>> $config - $clients client"
         python -m experiments.run_experiment \
