@@ -2,6 +2,11 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [1.1.1] - 2026-03-31
+
+### Modificato
+- README completamente riscritto: aggiunto indice (Table of Contents), infographic e methodological diagram con didascalie, sezioni dettagliate su FedAvg (Algorithm 1), Differential Privacy (Equazione 4), Privacy Threat Model (4 attacchi), Datasets (5 benchmark), Heterogeneous Architecture, Dimensions of Heterogeneity, overnight batch execution
+
 ## [1.1.0] - 2026-03-31
 
 ### Aggiunto
