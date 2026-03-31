@@ -34,7 +34,7 @@ experiments/results/*.csv
 !experiments/results/.gitkeep
 
 # Datasets (downloaded at runtime)
-data/
+/data/
 
 # Environment
 .env
