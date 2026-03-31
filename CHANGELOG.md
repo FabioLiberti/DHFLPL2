@@ -2,6 +2,18 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [1.1.0] - 2026-03-31
+
+### Aggiunto
+- Cartella `demos/` con script dimostrativi eseguibili per privacy e threat model:
+  - `demo_dp_comparison.py`: confronto FL con/senza DP, grafici trade-off privacy/performance
+  - `demo_gradient_inversion.py`: simulazione attacco gradient inversion con/senza DP
+  - `demo_membership_inference.py`: analisi membership inference con distribuzione confidence
+  - `demo_model_update_leakage.py`: monitoraggio magnitudine aggiornamenti e rischio leakage
+  - `demo_side_channel.py`: analisi timing e correlazione dimensione dati
+  - `demo_data_redaction.py`: pipeline redazione testo, record e rumore numerico
+- README aggiornato con sezione "Privacy & Threat Model Demos"
+
 ## [1.0.2] - 2026-03-31
 
 ### Aggiunto

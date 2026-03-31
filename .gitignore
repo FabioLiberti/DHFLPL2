@@ -33,6 +33,11 @@ experiments/results/*.png
 experiments/results/*.csv
 !experiments/results/.gitkeep
 
+# Demo outputs
+demos/outputs/*.png
+demos/outputs/*.json
+!demos/outputs/.gitkeep
+
 # Datasets (downloaded at runtime)
 /data/
 

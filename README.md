@@ -128,6 +128,32 @@ docker-compose up --build
 ./scripts/deploy.sh --scale 50
 ```
 
+## Privacy & Threat Model Demos
+
+Executable demonstrations of the privacy mechanisms and attack vectors described in the paper (Section 4.2):
+
+```bash
+# Differential Privacy comparison (standard vs DP)
+python -m demos.demo_dp_comparison --dataset mnist --rounds 30
+
+# Gradient Inversion Attack simulation
+python -m demos.demo_gradient_inversion --epsilon 1.0
+
+# Membership Inference Attack analysis
+python -m demos.demo_membership_inference --rounds 15
+
+# Model Update Leakage monitoring
+python -m demos.demo_model_update_leakage --rounds 20
+
+# Side-Channel Attack analysis
+python -m demos.demo_side_channel --clients 5
+
+# Data Redaction pipeline (text, records, numerical noise)
+python -m demos.demo_data_redaction
+```
+
+Results and plots are saved in `demos/outputs/`.
+
 ## Architecture
 
 ```
