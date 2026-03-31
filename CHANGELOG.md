@@ -2,6 +2,13 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [0.3.0] - 2026-03-31
+
+### Aggiunto
+- Modulo `src/privacy/dp_mechanism.py`: differential privacy con meccanismo gaussiano e laplaciano, redazione dati privati, gradient clipping, pipeline DP sui pesi
+- Modulo `src/privacy/threat_model.py`: simulazione 4 vettori di attacco (Gradient Inversion, Model Update Leakage, Membership Inference, Side-Channel Analysis)
+- Test unitari: test_privacy.py (redazione, rumore, clipping, analisi rischio)
+
 ## [0.2.0] - 2026-03-31
 
 ### Aggiunto
