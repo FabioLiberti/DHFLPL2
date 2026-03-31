@@ -12,4 +12,4 @@ dependencies:
   - pip:
       - tensorflow>=2.15.0
       - flwr>=1.7.0
-      - python-dp>=1.1.5
+      - python-dp>=1.1.5rc4

@@ -14,7 +14,7 @@ setup(
     install_requires=[
         "tensorflow>=2.15.0",
         "flwr>=1.7.0",
-        "python-dp>=1.1.5",
+        "python-dp>=1.1.5rc4",
         "numpy>=1.24.0",
         "matplotlib>=3.8.0",
         "pyyaml>=6.0",
