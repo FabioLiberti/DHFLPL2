@@ -361,29 +361,41 @@ python scripts/plot_results.py --results-dir experiments/results/
 
 ## Privacy & Threat Model Demos
 
-Executable demonstrations of the privacy mechanisms and attack vectors described in Section 4.2 of the paper. Each demo runs on real data (MNIST) and produces detailed plots:
+Executable demonstrations of the privacy mechanisms and attack vectors described in Section 4.2 of the paper.
+
+### Experimental Demos (real ML training on real datasets)
+
+These 5 demos run actual federated learning on real data (MNIST) and produce plots saved in `demos/outputs/`:
 
 ```bash
-# Differential Privacy comparison: shows accuracy trade-off with/without DP
+# Differential Privacy comparison: trains two real FL models (with/without DP),
+# compares accuracy, loss, and F1 trade-off
 python -m demos.demo_dp_comparison --dataset mnist --rounds 30
 
-# Gradient Inversion Attack: visual comparison of data reconstruction with/without DP
+# Gradient Inversion Attack: takes a real MNIST image, computes real gradients,
+# simulates reconstruction with/without DP protection
 python -m demos.demo_gradient_inversion --epsilon 1.0
 
-# Membership Inference Attack: confidence score distribution analysis
+# Membership Inference Attack: trains a real FL model, measures real confidence
+# scores on training vs test samples to assess membership leakage
 python -m demos.demo_membership_inference --rounds 15
 
-# Model Update Leakage: weight update magnitude and risk assessment
+# Model Update Leakage: monitors real weight changes during FL training,
+# analyzes magnitude and risk level with/without DP
 python -m demos.demo_model_update_leakage --rounds 20
 
-# Side-Channel Attack: timing variance and data size correlation analysis
+# Side-Channel Attack: measures real training times per client during FL,
+# analyzes timing variance and data size correlation
 python -m demos.demo_side_channel --clients 5
-
-# Data Redaction: text redaction (email, phone, address) and numerical noise
-python -m demos.demo_data_redaction
 ```
 
-Results and plots are saved in `demos/outputs/`.
+### Utility Demo (functional demonstration, no ML training)
+
+This demo showcases the data redaction capability described in Section 5.2 of the paper ("*redacted the private data of the users, such as email addresses, phone numbers, home addresses*"). It uses illustrative text samples to demonstrate the regex-based redaction pipeline and numerical noise augmentation. It does not perform ML training and produces terminal output only (no plots):
+
+```bash
+python -m demos.demo_data_redaction
+```
 
 ---
 
