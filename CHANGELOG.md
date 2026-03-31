@@ -2,6 +2,15 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [1.0.0] - 2026-03-31
+
+### Aggiunto
+- README completo: overview, quick start, architettura, struttura progetto, istruzioni Docker e k3s
+- Test di integrazione end-to-end (`tests/test_integration.py`): pipeline FL completa, FL con DP, metriche, redazione, analisi minacce, coerenza configurazione col paper
+
+### Modificato
+- README riscritto con documentazione tecnica completa, comandi di utilizzo e deployment
+
 ## [0.5.0] - 2026-03-31
 
 ### Aggiunto

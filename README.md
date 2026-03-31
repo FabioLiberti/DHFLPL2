@@ -1,10 +1,17 @@
-# Federated Learning in Dynamic and Heterogeneous Environments
+# DHFLPL2 — Federated Learning in Dynamic and Heterogeneous Environments
 
 > Advantages, Performances, and Privacy Problems
 
 [![DOI](https://img.shields.io/badge/DOI-10.3390%2Fapp14188490-blue)](https://doi.org/10.3390/app14188490)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Journal](https://img.shields.io/badge/Applied%20Sciences-2024-green)](https://www.mdpi.com/journal/applsci)
+[![Python](https://img.shields.io/badge/Python-%3E%3D3.10-blue)](https://python.org)
+
+## Overview
+
+A distributed Federated Learning (FL) framework designed for dynamic and heterogeneous environments with IoT devices and Edge Computing infrastructures. The system implements FedAvg on heterogeneous architectures (ARM64 + x86_64) orchestrated via Kubernetes (k3s), with Differential Privacy support.
+
+**Paper:** Liberti, F.; Berardi, D.; Martini, B. *Federated Learning in Dynamic and Heterogeneous Environments: Advantages, Performances, and Privacy Problems.* Applied Sciences **2024**, 14(18), 8490.
 
 ## Authors
 
@@ -14,54 +21,107 @@ Department of Science and Engineering, Universitas Mercatorum, 00186 Rome, Italy
 
 \* Correspondence: davide.berardi@unimercatorum.it
 
-## Abstract
+## Features
 
-Federated Learning (FL) represents a promising distributed learning methodology particularly suitable for dynamic and heterogeneous environments characterized by Internet of Things (IoT) devices and Edge Computing infrastructures. This work explores advanced techniques for dynamic model adaptation and heterogeneous data management in edge computing scenarios, proposing innovative solutions to improve the robustness and efficiency of federated learning. We present an innovative solution based on Kubernetes (k3s) which enables the fast application of FL models to heterogeneous architectures (ARM and x86). Experimental results demonstrate that our proposals can improve the performance of FL in IoT and edge environments, offering new perspectives for the practical implementation of decentralized intelligent systems.
+- **Federated Averaging (FedAvg)** — weighted aggregation across heterogeneous clients
+- **5 benchmark datasets** — CIFAR-10, CIFAR-100, MNIST, Fashion-MNIST, SVHN
+- **Non-IID data partitioning** — realistic federated data distribution
+- **Differential Privacy** — Gaussian/Laplace noise mechanisms, gradient clipping, data redaction
+- **Threat model simulation** — Gradient Inversion, Model Update Leakage, Membership Inference, Side-Channel analysis
+- **Container deployment** — Docker + Kubernetes (k3s) with support for ARM64 and x86_64
+- **Custom autoscaling** — precision-based automatic worker provisioning
+- **Reproducible experiments** — YAML configs, CLI runner, automated plot generation
 
-## Research Questions
-
-| ID | Question |
-|----|----------|
-| **Q1** | What are the impacts of heterogeneous environments in Federated Learning? |
-| **Q2** | How can the federated learning scenario benefit from different systems and architectures? |
-| **Q3** | What are the privacy implications of using federated learning? |
-| **Q4** | How can a cluster management system (i.e., Kubernetes) make the application of heterogeneous machine learning models feasible and easier to conduct? |
-
-## Methodology
-
-### Federated Averaging (FedAvg)
-
-The system implements the FedAvg algorithm, where the global model is updated as:
+## Project Structure
 
 ```
-w_{t+1} = Σ_{k=1}^{K} (n_k / n) * w_{t+1}^k
+DHFLPL2/
+├── src/
+│   ├── models/cnn.py              # CNN model for image classification
+│   ├── data/
+│   │   ├── loader.py              # Dataset loading (5 datasets)
+│   │   └── partitioner.py         # Non-IID data distribution
+│   ├── federation/
+│   │   ├── server.py              # FedAvg server orchestration
+│   │   ├── client.py              # FL client with local training
+│   │   ├── strategy.py            # Aggregation strategies
+│   │   ├── server_app.py          # Flower SuperLink entry point
+│   │   └── client_app.py          # Flower SuperNode entry point
+│   ├── privacy/
+│   │   ├── dp_mechanism.py        # Differential privacy mechanisms
+│   │   └── threat_model.py        # Attack vector simulation
+│   ├── metrics/evaluation.py      # Precision, recall, F1, accuracy
+│   └── utils/config.py            # Centralized configuration
+├── deploy/
+│   ├── docker/                    # Dockerfiles + docker-compose
+│   └── k8s/                       # k3s manifests + autoscaler
+├── experiments/
+│   ├── configs/                   # YAML configs per dataset
+│   ├── run_experiment.py          # Experiment runner CLI
+│   └── results/                   # Output directory
+├── scripts/
+│   ├── setup_cluster.sh           # k3s cluster setup
+│   ├── deploy.sh                  # Build + deploy automation
+│   └── plot_results.py            # Figure generation
+├── tests/                         # Unit tests
+├── paper/                         # Published paper (PDF)
+└── CHANGELOG.md                   # Development log
 ```
 
-where *K* is the total number of participating devices, *n_k* is the number of data samples on device *k*, *n* is the total number of samples across all devices, and *w_{t+1}^k* is the weight vector of the local model updated by device *k* at round *t+1*.
+## Quick Start
 
-### Differential Privacy
+### Installation
 
-Privacy is enforced through (ε, δ)-differential privacy:
-
+```bash
+git clone https://github.com/FabioLiberti/DHFLPL2.git
+cd DHFLPL2
+pip install -r requirements.txt
+pip install -e .
 ```
-Pr[M(D) ∈ S] ≤ e^ε * Pr[M(D') ∈ S] + δ
+
+### Run a Federated Experiment
+
+```bash
+# Single dataset, default clients (2, 5, 10, 20, 50)
+python -m experiments.run_experiment --config experiments/configs/cifar10.yml
+
+# Specific number of clients
+python -m experiments.run_experiment --config experiments/configs/mnist.yml --clients 10
+
+# All datasets, all configurations
+python -m experiments.run_experiment --all
 ```
 
-Implemented via the `pydp` library with two actions:
-1. **Redaction** of private data (email addresses, phone numbers, home addresses)
-2. **Noise augmentation** to prevent recognition of private numerical values
+### Generate Plots
 
-### Privacy Threat Model
+```bash
+python scripts/plot_results.py --results-dir experiments/results/
+```
 
-The system addresses the following attack vectors:
-- **Gradient Inversion Attacks** — reconstruction of original data from shared gradients
-- **Model Update Leakage** — inference from repeatedly shared model updates
-- **Side-Channel Attacks** — exploitation of timing or communication size metadata
-- **Membership Inference Attacks** — determining whether a data point was part of the training set
+### Docker (Local Testing)
+
+```bash
+cd deploy/docker
+docker-compose up --build
+```
+
+### Kubernetes (k3s) Deployment
+
+```bash
+# Setup controller node
+./scripts/setup_cluster.sh controller
+
+# Add worker nodes
+./scripts/setup_cluster.sh worker <CONTROLLER_IP> <TOKEN>
+
+# Deploy FL components
+./scripts/deploy.sh --clients 10 --dataset cifar10
+
+# Scale workers
+./scripts/deploy.sh --scale 50
+```
 
 ## Architecture
-
-The system is built on a multilayer architecture using Docker and Kubernetes (k3s):
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -77,74 +137,42 @@ The system is built on a multilayer architecture using Docker and Kubernetes (k3
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Components
+Heterogeneous architecture support: ARM64 and x86_64 nodes in the same cluster, with automatic pod scheduling across architectures.
 
-| Component | Role |
-|-----------|------|
-| **k3s Controller** | Lightweight Kubernetes distribution managing cluster orchestration |
-| **Rancher** | Web-based Kubernetes management platform |
-| **Flower (SuperLink + SuperNode)** | Federated learning framework handling model aggregation and distribution |
-| **Docker Containers** | Isolated, reproducible environments per node |
-| **Oracle Cloud Infrastructure (OCI)** | Hosting provider with x86 and ARM64 virtual machines |
+## Research Questions
 
-### Heterogeneous Architecture Support
-
-The platform runs on mixed architectures within the same cluster:
-- **ARM64** — ARM-based virtual machines (Oracle Cloud)
-- **x86_64 (AMD64)** — Intel-based virtual machines
-
-Nodes auto-register to the Flower platform upon container startup, enabling dynamic scaling via:
-```bash
-kubectl scale --replicas=50 fl/client
-```
-
-Custom autoscaling is also implemented: when precision drops below 50%, new worker nodes are automatically provisioned.
-
-## Datasets
-
-Experiments were conducted across five benchmark datasets with 2 to 50 federated clients over 150 epochs:
-
-| Dataset | Classes | Description | Source |
-|---------|---------|-------------|--------|
-| **CIFAR-10** | 10 | Color images (primary benchmark) | [cs.toronto.edu](https://www.cs.toronto.edu/~kriz/cifar.html) |
-| **CIFAR-100** | 100 | Fine-grained color images | [cs.toronto.edu](https://www.cs.toronto.edu/~kriz/cifar.html) |
-| **MNIST** | 10 | Handwritten digits | [yann.lecun.com](http://yann.lecun.com/exdb/mnist/) |
-| **Fashion-MNIST** | 10 | Clothing items | [fashion-mnist](http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/) |
-| **SVHN** | 10 | House street numbers (Google Street View) | [stanford.edu](http://ufldl.stanford.edu/housenumbers/) |
-
-Data distribution is **non-IID** across nodes, shuffled randomly to avoid overfitting.
+| ID | Question |
+|----|----------|
+| **Q1** | What are the impacts of heterogeneous environments in Federated Learning? |
+| **Q2** | How can the federated learning scenario benefit from different systems and architectures? |
+| **Q3** | What are the privacy implications of using federated learning? |
+| **Q4** | How can Kubernetes make heterogeneous ML models feasible and easier to conduct? |
 
 ## Results
+
+Experiments across 5 datasets, 2 to 50 clients, 150 epochs:
 
 | Metric | Best | Worst |
 |--------|------|-------|
 | **Accuracy** | 99.996% (MNIST, 2 clients) | 35.53% (CIFAR-100, 50 clients) |
 
-### Key Findings
-
-- **Client count** does not significantly impact accuracy for simple datasets (e.g., MNIST)
-- **Class granularity** is the dominant factor in accuracy degradation (CIFAR-100 vs CIFAR-10)
-- Performance on heterogeneous architectures (ARM + x86) shows **comparable progression** to homogeneous setups, without significant performance loss
-- Federated accuracy remains **below centralized baselines** (~99%), consistent with known FL limitations due to local minima in distributed optimization
-
-## Dimensions of Heterogeneity Addressed
-
-| Dimension | Challenge |
-|-----------|-----------|
-| **Communication** | Variable bandwidth, latency, reliability across network protocols |
-| **Models** | Different architectures and data formats affecting aggregation |
-| **Statistics** | Non-uniform, non-IID data distributions causing over/under-fitting |
-| **Devices** | Disparate computing power, memory, and communication capabilities |
+Key findings:
+- Client count does not significantly impact accuracy for simple datasets
+- Class granularity is the dominant factor in accuracy degradation
+- Heterogeneous architectures (ARM + x86) show comparable progression to homogeneous setups
+- Custom autoscaling (precision threshold at 50%) improves model convergence
 
 ## Technology Stack
 
-- **Orchestration**: Kubernetes (k3s) + Docker
-- **Federated Learning**: [Flower](https://flower.ai/) (SuperLink + SuperNode architecture)
-- **Privacy**: `pydp` (differential privacy)
-- **Cloud**: Oracle Cloud Infrastructure (OCI)
-- **Management**: Rancher
-- **ML Framework**: TensorFlow/Keras
-- **Language**: Python
+| Component | Technology |
+|-----------|------------|
+| Language | Python >= 3.10 |
+| ML Framework | TensorFlow/Keras |
+| FL Framework | [Flower](https://flower.ai/) |
+| Privacy | Differential Privacy (Gaussian, Laplace) |
+| Orchestration | Kubernetes (k3s) + Docker |
+| Cloud | Oracle Cloud Infrastructure (OCI) |
+| Management | Rancher |
 
 ## Citation
 
