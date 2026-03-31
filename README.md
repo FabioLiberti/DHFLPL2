@@ -9,31 +9,53 @@
 
 ---
 
+## Authors
+
+**Fabio Liberti**, **Davide Berardi**\*, **Barbara Martini**
+
+Department of Science and Engineering, Universitas Mercatorum, 00186 Rome, Italy
+
+\* Correspondence: davide.berardi@unimercatorum.it
+
+---
+
 ## Table of Contents
 
-- [Overview](#overview)
-- [Infographic](#infographic)
-- [Methodological Diagram](#methodological-diagram)
-- [Authors](#authors)
-- [Research Questions](#research-questions)
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Federated Averaging (FedAvg)](#federated-averaging-fedavg)
-- [Differential Privacy](#differential-privacy)
-- [Privacy Threat Model](#privacy-threat-model)
-- [Datasets](#datasets)
-- [Heterogeneous Architecture](#heterogeneous-architecture)
-- [Results](#results)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Quick Start](#quick-start)
-- [Running Experiments](#running-experiments)
-- [Privacy & Threat Model Demos](#privacy--threat-model-demos)
-- [Docker Deployment](#docker-deployment)
-- [Kubernetes (k3s) Deployment](#kubernetes-k3s-deployment)
-- [Overnight Batch Execution](#overnight-batch-execution)
-- [Citation](#citation)
-- [License](#license)
+- [DHFLPL2 — Federated Learning in Dynamic and Heterogeneous Environments](#dhflpl2--federated-learning-in-dynamic-and-heterogeneous-environments)
+  - [Authors](#authors)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Infographic](#infographic)
+  - [Methodological Diagram](#methodological-diagram)
+  - [Research Questions](#research-questions)
+  - [Features](#features)
+  - [System Architecture](#system-architecture)
+  - [Federated Averaging (FedAvg)](#federated-averaging-fedavg)
+  - [Differential Privacy](#differential-privacy)
+  - [Privacy Threat Model](#privacy-threat-model)
+  - [Datasets](#datasets)
+  - [Heterogeneous Architecture](#heterogeneous-architecture)
+  - [Dimensions of Heterogeneity](#dimensions-of-heterogeneity)
+  - [Results](#results)
+    - [Key Findings](#key-findings)
+  - [Technology Stack](#technology-stack)
+  - [Project Structure](#project-structure)
+  - [Quick Start](#quick-start)
+    - [Installation](#installation)
+  - [Running Experiments](#running-experiments)
+    - [Single Experiment](#single-experiment)
+    - [All Experiments](#all-experiments)
+    - [Generate Plots](#generate-plots)
+  - [Privacy \& Threat Model Demos](#privacy--threat-model-demos)
+    - [Experimental Demos (real ML training on real datasets)](#experimental-demos-real-ml-training-on-real-datasets)
+    - [Utility Demo (functional demonstration, no ML training)](#utility-demo-functional-demonstration-no-ml-training)
+  - [Docker Deployment](#docker-deployment)
+  - [Kubernetes (k3s) Deployment](#kubernetes-k3s-deployment)
+    - [Cluster Setup](#cluster-setup)
+    - [Deploy and Scale](#deploy-and-scale)
+  - [Overnight Batch Execution](#overnight-batch-execution)
+  - [Citation](#citation)
+  - [License](#license)
 
 ---
 
@@ -60,16 +82,6 @@ The framework implements the Federated Averaging (FedAvg) algorithm on heterogen
 ![DHFLPL2 Methodological Diagram](img/Methodological_Diagram_DHFLPL2.png)
 
 *Figure: Detailed methodological flow of the DHFLPL2 framework. The diagram illustrates the complete pipeline: (1) the Kubernetes k3s cluster controller managing orchestration, Rancher dashboard, and dataset registry; (2) Flower SuperNodes performing non-IID data partitioning, local CNN training, and raw model updates on heterogeneous ARM64/x86_64 worker nodes; (3) the Differential Privacy mechanism applying gradient clipping, Gaussian/Laplace noise, and data redaction to protect model updates; (4) the threat model simulation layer testing against gradient inversion, model update leakage, membership inference, and side-channel attacks; (5) the Flower SuperLink performing weighted FedAvg aggregation; and (6) the global model evaluation tracking accuracy, precision, recall, and F1 metrics.*
-
----
-
-## Authors
-
-**Fabio Liberti**, **Davide Berardi**\*, **Barbara Martini**
-
-Department of Science and Engineering, Universitas Mercatorum, 00186 Rome, Italy
-
-\* Correspondence: davide.berardi@unimercatorum.it
 
 ---
 
