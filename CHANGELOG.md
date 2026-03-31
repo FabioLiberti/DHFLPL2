@@ -2,6 +2,13 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [0.4.0] - 2026-03-31
+
+### Aggiunto
+- Script `experiments/run_experiment.py`: entry point per riprodurre tutti gli esperimenti del paper (5 dataset, 2-50 client, 150 round, supporto DP)
+- Configurazioni YAML per ogni dataset: cifar10, cifar100, mnist, fashion_mnist, svhn
+- Script `scripts/plot_results.py`: generazione Figure 2 (griglia accuracy/loss), Figure 3 (federato vs centralizzato), tabella riassuntiva
+
 ## [0.3.0] - 2026-03-31
 
 ### Aggiunto
