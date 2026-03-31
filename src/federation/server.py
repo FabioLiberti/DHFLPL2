@@ -11,7 +11,7 @@ import numpy as np
 from src.models.cnn import create_model
 from src.federation.client import FLClient
 from src.federation.strategy import federated_averaging
-from src.metrics.evaluation import evaluate_model
+from src.metrics.evaluation import evaluate_with_metrics
 
 
 class FLServer:
@@ -108,7 +108,7 @@ class FLServer:
             loss, acc = self.global_model.evaluate(
                 x_test, y_test, verbose=0,
             )
-            metrics = evaluate_model(
+            metrics = evaluate_with_metrics(
                 self.global_model, x_test, y_test,
             )
 

@@ -1,0 +1,16 @@
+dataset: svhn
+num_classes: 10
+input_shape: [32, 32, 3]
+
+federation:
+  num_rounds: 150
+  local_epochs: 1
+  batch_size: 32
+
+clients: [2, 5, 10, 20, 50]
+
+privacy:
+  enabled: true
+  epsilon: 1.0
+  delta: 1.0e-5
+  clip_norm: 1.0

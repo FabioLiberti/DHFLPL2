@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 
-def evaluate_model(model, x_test, y_test):
+def evaluate_with_metrics(model, x_test, y_test):
     """Valuta il modello con metriche di classificazione.
 
     Args:

@@ -13,7 +13,7 @@ from src.data.partitioner import split_data_for_federated_learning
 from src.federation.server import FLServer
 from src.federation.client import FLClient
 from src.federation.strategy import federated_averaging
-from src.metrics.evaluation import evaluate_model, evaluate_per_class
+from src.metrics.evaluation import evaluate_with_metrics, evaluate_per_class
 from src.privacy.dp_mechanism import (
     apply_dp_to_weights,
     add_gaussian_noise,
@@ -112,7 +112,7 @@ class TestEndToEndFederation(unittest.TestCase):
         new_weights = federated_averaging(client_weights, client_sizes)
         model.set_weights(new_weights)
 
-        metrics = evaluate_model(model, self.x_test, self.y_test)
+        metrics = evaluate_with_metrics(model, self.x_test, self.y_test)
         self.assertIn("accuracy", metrics)
         self.assertIn("precision", metrics)
         self.assertIn("f1", metrics)
@@ -147,12 +147,12 @@ class TestEndToEndFederation(unittest.TestCase):
 class TestEndToEndMetrics(unittest.TestCase):
     """Test integrazione del sistema di metriche."""
 
-    def test_evaluate_model_complete(self):
+    def test_evaluate_with_metrics_complete(self):
         model = create_model((28, 28, 1), 10)
         x = np.random.rand(30, 28, 28, 1).astype("float32")
         y = np.random.randint(0, 10, size=30)
 
-        metrics = evaluate_model(model, x, y)
+        metrics = evaluate_with_metrics(model, x, y)
         required_keys = ["loss", "accuracy", "precision", "recall", "f1"]
         for key in required_keys:
             self.assertIn(key, metrics)

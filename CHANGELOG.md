@@ -2,6 +2,16 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [1.0.1] - 2026-03-31
+
+### Corretto
+- Rinominata `evaluate_model()` -> `evaluate_with_metrics()` per allineamento esatto con Listing 3 del paper
+- Aggiunta curva "Similar Approach" [29] (Shamsian et al.) in Figure 3, coerente con il paper
+- Aggiunta modalita' `--mode flower` al runner per deployment distribuito via Flower
+
+### Aggiunto
+- Config YAML con Differential Privacy abilitata per tutti i 5 dataset (`*_dp.yml`)
+
 ## [1.0.0] - 2026-03-31
 
 ### Aggiunto

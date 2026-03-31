@@ -5,10 +5,16 @@ Riproduce i risultati delle Figure 2 e 3:
 - Da 2 a 50 client federati
 - 150 round di FedAvg per configurazione
 
+Due modalita' di esecuzione:
+- simulation (default): esegue tutto in-process usando FLServer
+- flower: avvia server e client Flower per deployment distribuito
+
 Uso:
     python -m experiments.run_experiment --config experiments/configs/cifar10.yml
     python -m experiments.run_experiment --config experiments/configs/mnist.yml --clients 2
+    python -m experiments.run_experiment --config experiments/configs/cifar10_dp.yml
     python -m experiments.run_experiment --all
+    python -m experiments.run_experiment --config experiments/configs/cifar10.yml --mode flower
 """
 
 import argparse
@@ -120,7 +126,7 @@ def _run_with_dp(server, test_data, fl_config, dp_config):
     clip_norm = dp_config.get("clip_norm", 1.0)
 
     from src.federation.strategy import federated_averaging
-    from src.metrics.evaluation import evaluate_model
+    from src.metrics.evaluation import evaluate_with_metrics
 
     for round_num in range(1, fl_config["num_rounds"] + 1):
         global_weights = server.global_model.get_weights()
@@ -146,7 +152,7 @@ def _run_with_dp(server, test_data, fl_config, dp_config):
         server.global_model.set_weights(new_weights)
 
         loss, acc = server.global_model.evaluate(x_test, y_test, verbose=0)
-        metrics = evaluate_model(server.global_model, x_test, y_test)
+        metrics = evaluate_with_metrics(server.global_model, x_test, y_test)
 
         server.history["round"].append(round_num)
         server.history["loss"].append(loss)
@@ -235,10 +241,17 @@ def main():
         "--all", action="store_true",
         help="Esegui tutti gli esperimenti per tutti i dataset",
     )
+    parser.add_argument(
+        "--mode", type=str, choices=["simulation", "flower"],
+        default="simulation",
+        help="Modalita': simulation (in-process) o flower (distribuito)",
+    )
 
     args = parser.parse_args()
 
-    if args.all:
+    if args.mode == "flower":
+        _print_flower_instructions(args)
+    elif args.all:
         run_all(output_dir=args.output)
     elif args.config:
         run_from_config(
@@ -248,6 +261,33 @@ def main():
         )
     else:
         parser.print_help()
+
+
+def _print_flower_instructions(args):
+    """Istruzioni per l'esecuzione in modalita' Flower distribuita."""
+    print("=" * 60)
+    print("MODALITA' FLOWER (deployment distribuito)")
+    print("=" * 60)
+    print()
+    print("Per eseguire con Flower, avvia i componenti separatamente:")
+    print()
+    print("1. Avvia il server (SuperLink):")
+    print("   FL_DATASET=cifar10 FL_NUM_ROUNDS=150 \\")
+    print("     python -m src.federation.server_app")
+    print()
+    print("2. Avvia i client (SuperNode) in terminali separati:")
+    print("   FL_SERVER_ADDRESS=localhost:8080 FL_DATASET=cifar10 \\")
+    print("     FL_CLIENT_ID=1 python -m src.federation.client_app")
+    print()
+    print("   FL_SERVER_ADDRESS=localhost:8080 FL_DATASET=cifar10 \\")
+    print("     FL_CLIENT_ID=2 python -m src.federation.client_app")
+    print()
+    print("Oppure usa Docker Compose:")
+    print("   cd deploy/docker && docker-compose up --build")
+    print()
+    print("Oppure deploya su k3s:")
+    print("   ./scripts/deploy.sh --clients 10 --dataset cifar10")
+    print("=" * 60)
 
 
 if __name__ == "__main__":
