@@ -2,6 +2,12 @@
 
 Tutte le modifiche rilevanti al progetto DHFLPL2 sono documentate in questo file.
 
+## [1.0.2] - 2026-03-31
+
+### Aggiunto
+- `environment.yml`: Conda environment con tutte le dipendenze (Python 3.11, TensorFlow, Flower, pydp)
+- README aggiornato con istruzioni di installazione Conda
+
 ## [1.0.1] - 2026-03-31
 
 ### Corretto

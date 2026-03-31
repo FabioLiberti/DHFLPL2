@@ -75,6 +75,13 @@ DHFLPL2/
 ```bash
 git clone https://github.com/FabioLiberti/DHFLPL2.git
 cd DHFLPL2
+
+# Conda (recommended)
+conda env create -f environment.yml
+conda activate dhflpl2
+pip install -e .
+
+# Alternatively, with pip
 pip install -r requirements.txt
 pip install -e .
 ```
