@@ -4,7 +4,7 @@
 #
 # Esegue tutti gli esperimenti, demo e genera tutti i grafici.
 # Pensato per esecuzione notturna non presidiata.
-# Mostra tabella di sintesi con progresso e tempi.
+# Mostra tabella di stato e sintesi con progresso e tempi.
 #
 # Uso:
 #   cd /Users/fxlybs/_DEV/DHFLPL2
@@ -25,16 +25,103 @@ COMPLETED=0
 SKIPPED=0
 TASK_TIMES=()
 
+# Stato esperimenti: "done", "running", "skip", "-"
+declare -A EXP_STATUS
+DATASETS_STD=(cifar10 cifar100 mnist fashion_mnist svhn)
+DATASETS_DP=(cifar10_dp cifar100_dp mnist_dp fashion_mnist_dp svhn_dp)
+CLIENTS=(2 5 10 20 50)
+CURRENT_PHASE=0
+PHASE_NAMES=("Non iniziata" "Fase 1: Standard" "Fase 2: Con DP" "Fase 3: Grafici" "Fase 4: Demo" "Completata")
+
+# Inizializza stato
+for ds in "${DATASETS_STD[@]}"; do
+    for cl in "${CLIENTS[@]}"; do
+        if [ -f "$RESULTS_DIR/${ds}_${cl}clients.json" ]; then
+            EXP_STATUS["std_${ds}_${cl}"]="done"
+        else
+            EXP_STATUS["std_${ds}_${cl}"]="-"
+        fi
+    done
+done
+for ds in "${DATASETS_DP[@]}"; do
+    for cl in "${CLIENTS[@]}"; do
+        if [ -f "$RESULTS_DIR/${ds}_${cl}clients.json" ]; then
+            EXP_STATUS["dp_${ds}_${cl}"]="done"
+        else
+            EXP_STATUS["dp_${ds}_${cl}"]="-"
+        fi
+    done
+done
+
 START_TIME=$(date '+%s')
 START_TIME_FMT=$(date '+%Y-%m-%d %H:%M:%S')
 
-print_header() {
+print_status_table() {
+    local elapsed=$(( $(date '+%s') - START_TIME ))
+    local elapsed_fmt=$(printf '%02d:%02d:%02d' $((elapsed/3600)) $(((elapsed%3600)/60)) $((elapsed%60)))
+    local done_count=0
+    local total_count=50
+
+    # Conta completati
+    for key in "${!EXP_STATUS[@]}"; do
+        if [ "${EXP_STATUS[$key]}" = "done" ] || [ "${EXP_STATUS[$key]}" = "skip" ]; then
+            done_count=$((done_count + 1))
+        fi
+    done
+    local pct=$(( done_count * 100 / total_count ))
+
     echo ""
-    echo "╔══════════════════════════════════════════════════════════════╗"
-    echo "║  DHFLPL2 - Piano Sperimentale Completo                     ║"
-    echo "║  Inizio: $START_TIME_FMT                              ║"
-    echo "║  Totale previsto: $TOTAL_TASKS task (50 exp + 1 plot + 6 demo + 1 summary) ║"
-    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo "╔══════════════════════════════════════════════════════════════════════════╗"
+    echo "║  DHFLPL2 - STATO PIANO SPERIMENTALE                                    ║"
+    echo "║  Trascorso: $elapsed_fmt  |  Progresso: $done_count/$total_count esperimenti ($pct%)            ║"
+    echo "╠══════════════════════════════════════════════════════════════════════════╣"
+    echo "║                                                                        ║"
+    echo "║  Fase 1 — Standard (25 esperimenti)                                    ║"
+    echo "║  ┌──────────────────┬────────┬────────┬────────┬────────┬────────┐     ║"
+    echo "║  │ Dataset          │  2 cl  │  5 cl  │ 10 cl  │ 20 cl  │ 50 cl  │     ║"
+    echo "║  ├──────────────────┼────────┼────────┼────────┼────────┼────────┤     ║"
+
+    for ds in "${DATASETS_STD[@]}"; do
+        local c2="${EXP_STATUS[std_${ds}_2]}"
+        local c5="${EXP_STATUS[std_${ds}_5]}"
+        local c10="${EXP_STATUS[std_${ds}_10]}"
+        local c20="${EXP_STATUS[std_${ds}_20]}"
+        local c50="${EXP_STATUS[std_${ds}_50]}"
+        printf "║  │ %-16s │ %-6s │ %-6s │ %-6s │ %-6s │ %-6s │     ║\n" \
+            "$ds" "$c2" "$c5" "$c10" "$c20" "$c50"
+    done
+
+    echo "║  └──────────────────┴────────┴────────┴────────┴────────┴────────┘     ║"
+    echo "║                                                                        ║"
+    echo "║  Fase 2 — Con DP (25 esperimenti)                                      ║"
+    echo "║  ┌──────────────────┬────────┬────────┬────────┬────────┬────────┐     ║"
+    echo "║  │ Dataset          │  2 cl  │  5 cl  │ 10 cl  │ 20 cl  │ 50 cl  │     ║"
+    echo "║  ├──────────────────┼────────┼────────┼────────┼────────┼────────┤     ║"
+
+    for ds in "${DATASETS_DP[@]}"; do
+        local c2="${EXP_STATUS[dp_${ds}_2]}"
+        local c5="${EXP_STATUS[dp_${ds}_5]}"
+        local c10="${EXP_STATUS[dp_${ds}_10]}"
+        local c20="${EXP_STATUS[dp_${ds}_20]}"
+        local c50="${EXP_STATUS[dp_${ds}_50]}"
+        printf "║  │ %-16s │ %-6s │ %-6s │ %-6s │ %-6s │ %-6s │     ║\n" \
+            "$ds" "$c2" "$c5" "$c10" "$c20" "$c50"
+    done
+
+    echo "║  └──────────────────┴────────┴────────┴────────┴────────┴────────┘     ║"
+    echo "║                                                                        ║"
+
+    # Stato fasi
+    local f3_status="-"
+    local f4_status="-"
+    if [ $CURRENT_PHASE -ge 3 ]; then f3_status="in corso"; fi
+    if [ $CURRENT_PHASE -ge 4 ]; then f3_status="done"; f4_status="in corso"; fi
+    if [ $CURRENT_PHASE -ge 5 ]; then f4_status="done"; fi
+
+    printf "║  Fase 3 — Grafici: %-49s ║\n" "$f3_status"
+    printf "║  Fase 4 — 6 Demo:  %-49s ║\n" "$f4_status"
+    echo "║                                                                        ║"
+    echo "╚══════════════════════════════════════════════════════════════════════════╝"
 }
 
 print_progress() {
@@ -75,15 +162,19 @@ run_experiment() {
     local config_file="$2"
     local clients="$3"
     local task_num="$4"
+    local phase_prefix="$5"
     local result_file="$RESULTS_DIR/${config_name}_${clients}clients.json"
 
     if [ -f "$result_file" ]; then
         SKIPPED=$((SKIPPED + 1))
         COMPLETED=$((COMPLETED + 1))
+        EXP_STATUS["${phase_prefix}_${config_name}_${clients}"]="skip"
         echo "  >> SKIP $config_name - $clients client (gia' completato)"
         return
     fi
 
+    EXP_STATUS["${phase_prefix}_${config_name}_${clients}"]=">>>"
+    print_status_table
     print_progress $task_num $TOTAL_TASKS "$config_name | $clients client"
 
     local exp_start=$(date '+%s')
@@ -97,6 +188,8 @@ run_experiment() {
     local exp_fmt=$(printf '%02d:%02d' $((exp_elapsed/60)) $((exp_elapsed%60)))
     TASK_TIMES+=("$config_name|${clients}cl|${exp_fmt}")
     COMPLETED=$((COMPLETED + 1))
+
+    EXP_STATUS["${phase_prefix}_${config_name}_${clients}"]="done"
 
     echo "  >> Completato in $exp_fmt ($config_name $clients client)"
 }
@@ -121,43 +214,56 @@ print_summary_table() {
 # INIZIO ESECUZIONE
 # ===================================================================
 
-print_header
+echo ""
+echo "╔══════════════════════════════════════════════════════════════╗"
+echo "║  DHFLPL2 - Piano Sperimentale Completo                     ║"
+echo "║  Inizio: $START_TIME_FMT                              ║"
+echo "║  Totale: $TOTAL_TASKS task (50 exp + 1 plot + 6 demo + 1 summary)   ║"
+echo "╚══════════════════════════════════════════════════════════════╝"
+
+# Stampa stato iniziale
+print_status_table
 
 # ---------------------------------------------------------------
 # FASE 1: ESPERIMENTI STANDARD (25)
 # ---------------------------------------------------------------
+CURRENT_PHASE=1
 echo ""
 echo "============================================================"
 echo "  FASE 1/4: Esperimenti standard (senza DP) [25 esperimenti]"
 echo "============================================================"
 
 TASK_NUM=0
-for config in cifar10 cifar100 mnist fashion_mnist svhn; do
-    for clients in 2 5 10 20 50; do
+for config in "${DATASETS_STD[@]}"; do
+    for clients in "${CLIENTS[@]}"; do
         TASK_NUM=$((TASK_NUM + 1))
-        run_experiment "$config" "$config" "$clients" "$TASK_NUM"
+        run_experiment "$config" "$config" "$clients" "$TASK_NUM" "std"
     done
 done
 
 # ---------------------------------------------------------------
 # FASE 2: ESPERIMENTI CON DP (25)
 # ---------------------------------------------------------------
+CURRENT_PHASE=2
 echo ""
 echo "============================================================"
 echo "  FASE 2/4: Esperimenti con Differential Privacy [25 esperimenti]"
 echo "============================================================"
 
-for config in cifar10 cifar100 mnist fashion_mnist svhn; do
-    for clients in 2 5 10 20 50; do
+for config in "${DATASETS_STD[@]}"; do
+    dp_config="${config}_dp"
+    for clients in "${CLIENTS[@]}"; do
         TASK_NUM=$((TASK_NUM + 1))
-        run_experiment "${config}_dp" "${config}_dp" "$clients" "$TASK_NUM"
+        run_experiment "$dp_config" "$dp_config" "$clients" "$TASK_NUM" "dp"
     done
 done
 
 # ---------------------------------------------------------------
 # FASE 3: GENERAZIONE GRAFICI
 # ---------------------------------------------------------------
+CURRENT_PHASE=3
 TASK_NUM=$((TASK_NUM + 1))
+print_status_table
 print_progress $TASK_NUM $TOTAL_TASKS "Generazione grafici (Figure 2, 3, tabella)"
 
 echo ""
@@ -173,6 +279,7 @@ COMPLETED=$((COMPLETED + 1))
 # ---------------------------------------------------------------
 # FASE 4: DEMO PRIVACY E THREAT MODEL
 # ---------------------------------------------------------------
+CURRENT_PHASE=4
 echo ""
 echo "============================================================"
 echo "  FASE 4/4: Demo privacy e threat model [6 demo]"
@@ -207,11 +314,16 @@ done
 # ---------------------------------------------------------------
 # COMPLETATO
 # ---------------------------------------------------------------
+CURRENT_PHASE=5
 END_TIME=$(date '+%s')
 END_TIME_FMT=$(date '+%Y-%m-%d %H:%M:%S')
 TOTAL_ELAPSED=$(( END_TIME - START_TIME ))
 TOTAL_FMT=$(printf '%02d:%02d:%02d' $((TOTAL_ELAPSED/3600)) $(((TOTAL_ELAPSED%3600)/60)) $((TOTAL_ELAPSED%60)))
 
+# Tabella stato finale
+print_status_table
+
+# Tabella tempi
 print_summary_table
 
 echo ""
