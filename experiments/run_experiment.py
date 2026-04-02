@@ -101,8 +101,9 @@ def run_single_experiment(config, num_clients, output_dir):
         "history": history,
     }
 
+    dp_suffix = "_dp" if dp_config.get("enabled", False) else ""
     result_path = os.path.join(
-        output_dir, f"{dataset_name}_{num_clients}clients.json",
+        output_dir, f"{dataset_name}{dp_suffix}_{num_clients}clients.json",
     )
     with open(result_path, "w") as f:
         json.dump(result, f, indent=2)

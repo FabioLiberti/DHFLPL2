@@ -2,6 +2,9 @@
 ANALYSIS.md
 SAL_info_31032026.rtf
 
+# Piano sperimentale (local only)
+piano_sperimentale/
+
 # Python
 __pycache__/
 *.py[cod]
