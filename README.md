@@ -1,6 +1,6 @@
 # DHFLPL2 — Federated Learning in Dynamic and Heterogeneous Environments
 
-> Advantages, Performances, and Privacy Problems
+> **Advantages, Performances, and Privacy Problems**
 
 [![DOI](https://img.shields.io/badge/DOI-10.3390%2Fapp14188490-blue)](https://doi.org/10.3390/app14188490)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
@@ -16,6 +16,16 @@
 Department of Science and Engineering, Universitas Mercatorum, 00186 Rome, Italy
 
 \* Correspondence: davide.berardi@unimercatorum.it
+
+---
+
+## Overview
+
+A distributed Federated Learning (FL) framework designed for dynamic and heterogeneous environments characterized by Internet of Things (IoT) devices and Edge Computing infrastructures. The system enables decentralized model training across multiple devices while preserving data privacy, addressing the challenges posed by diverse device capabilities, varying network conditions, and non-IID data distributions.
+
+The framework implements the Federated Averaging (FedAvg) algorithm on heterogeneous architectures (ARM64 + x86_64) orchestrated via Kubernetes (k3s), with Differential Privacy mechanisms to mitigate privacy leakage threats including gradient inversion, model update leakage, membership inference, and side-channel attacks.
+
+**Paper:** Liberti, F.; Berardi, D.; Martini, B. *Federated Learning in Dynamic and Heterogeneous Environments: Advantages, Performances, and Privacy Problems.* Applied Sciences **2024**, 14(18), 8490.
 
 ---
 
@@ -56,16 +66,6 @@ Department of Science and Engineering, Universitas Mercatorum, 00186 Rome, Italy
   - [Overnight Batch Execution](#overnight-batch-execution)
   - [Citation](#citation)
   - [License](#license)
-
----
-
-## Overview
-
-A distributed Federated Learning (FL) framework designed for dynamic and heterogeneous environments characterized by Internet of Things (IoT) devices and Edge Computing infrastructures. The system enables decentralized model training across multiple devices while preserving data privacy, addressing the challenges posed by diverse device capabilities, varying network conditions, and non-IID data distributions.
-
-The framework implements the Federated Averaging (FedAvg) algorithm on heterogeneous architectures (ARM64 + x86_64) orchestrated via Kubernetes (k3s), with Differential Privacy mechanisms to mitigate privacy leakage threats including gradient inversion, model update leakage, membership inference, and side-channel attacks.
-
-**Paper:** Liberti, F.; Berardi, D.; Martini, B. *Federated Learning in Dynamic and Heterogeneous Environments: Advantages, Performances, and Privacy Problems.* Applied Sciences **2024**, 14(18), 8490.
 
 ---
 
